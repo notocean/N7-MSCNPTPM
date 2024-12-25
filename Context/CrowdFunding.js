@@ -14,7 +14,7 @@ export const CrowdFundingProvider = ({ children }) => {
   const [currentAccount, setCurrentAccount] = useState("");
 
   const createCampaign = async (campaign) => {
-    const { title, description, amount, deadline } = campaign;
+    const { title, description, amount, startDate, deadline, imageURL } = campaign;
     const web3Modal = new Web3Modal();
     const connection = await web3Modal.connect();
     const provider = new ethers.providers.Web3Provider(connection);
@@ -28,7 +28,9 @@ export const CrowdFundingProvider = ({ children }) => {
         title,
         description,
         ethers.utils.parseUnits(amount, 18),
-        new Date(deadline).getTime()
+        new Date(startDate).getTime(),
+        new Date(deadline).getTime(),
+        imageURL
       );
 
       await transaction.wait();
@@ -50,7 +52,9 @@ export const CrowdFundingProvider = ({ children }) => {
       title: campaign.title,
       description: campaign.description,
       target: ethers.utils.formatEther(campaign.target.toString()),
+      startDate: campaign.startDate.toNumber(),
       deadline: campaign.deadline.toNumber(),
+      imageURL: campaign.imageURL,
       amountCollected: ethers.utils.formatEther(
         campaign.amountCollected.toString()
       ),
@@ -69,11 +73,13 @@ export const CrowdFundingProvider = ({ children }) => {
     const accounts = await window.ethereum.request({
       method: "eth_accounts",
     });
+
     const currentUser = accounts[0];
 
     const filteredCampaigns = allCampaigns.filter(
       (campaign) =>
-        campaign.owner === "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+        campaign.owner.toString().toLowerCase() ===
+        currentUser.toString().toLowerCase()
     );
 
     const userData = filteredCampaigns.map((campaign, i) => ({
@@ -81,7 +87,9 @@ export const CrowdFundingProvider = ({ children }) => {
       title: campaign.title,
       description: campaign.description,
       target: ethers.utils.formatEther(campaign.target.toString()),
+      startDate: campaign.startDate.toNumber(),
       deadline: campaign.deadline.toNumber(),
+      imageURL: campaign.imageURL,
       amountCollected: ethers.utils.formatEther(
         campaign.amountCollected.toString()
       ),
@@ -122,9 +130,8 @@ export const CrowdFundingProvider = ({ children }) => {
         donator: donations[0][i],
         donation: ethers.utils.formatEther(donations[1][i].toString()),
       });
-
-      return parsedDonations;
     }
+    return parsedDonations;
   };
 
   const checkIfWalletConnected = async () => {

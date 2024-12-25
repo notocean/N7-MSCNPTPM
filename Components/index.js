@@ -1,8 +1,9 @@
 import Header from "./Header";
-import Hero from "./Hero";
+import Home from "./Home";
 import PopUp from "./Popup";
 import Card from "./Card";
 import Logo from "./Logo";
-import ICON from "./ICON";
+import Icon from "./Icon";
+import Add from "./Add"
 
-export { Header, Hero, PopUp, Card, Logo, ICON };
+export { Header, Add, Home, PopUp, Card, Logo, Icon };

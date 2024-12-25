@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import { CrowdFundingContext } from "../Context/CrowdFunding";
-import { Home } from "../Components";
+import { Add } from "../Components";
 
-const index = () => {
+const addcampaign = () => {
   const {
     titleData,
     createCampaign,
@@ -10,9 +10,9 @@ const index = () => {
   
   return (
     <>
-      <Home titleData={titleData} createCampaign={createCampaign} />
+      <Add titleData={titleData} createCampaign={createCampaign} />
     </>
   );
 };
 
-export default index;
+export default addcampaign;

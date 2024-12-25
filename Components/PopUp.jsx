@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 
-const PopUp = ({ setOpenModel, donate, donateFunction, getDonations }) => {
+const PopUp = ({
+  compaignType,
+  setOpenModel,
+  donate,
+  donateFunction,
+  getDonations,
+  campaign,
+}) => {
   const [amount, setAmount] = useState("");
   const [allDonationData, setallDonationData] = useState();
 
@@ -20,93 +27,125 @@ const PopUp = ({ setOpenModel, donate, donateFunction, getDonations }) => {
       setallDonationData(donationData);
     };
   }, []);
+
   return (
     <>
       <div
         className="justify-center items-center flex overflow-x-hidden
-      overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
+      overflow-y-auto fixed inset-0 z-50"
       >
-        <div className="relative w-auto my-6 mx-auto max-w-3xl">
-          {/*content*/}
+        <div className="relative w-full my-6 mx-auto max-w-3xl">
           <div
-            className="border-0 rounded-lg shadow-lg relative flex flex-col w-full
-          bg-white outline-none focus:outline-none"
+            className="rounded-lg shadow-lg relative flex flex-col w-full
+          bg-white border-2 border-gray-300"
           >
-            {/*header*/}
             <div
               className="flex items-start justify-between p-5 border-b border-solid
             border-state-200 rounded-t"
             >
               <h3 className="text-3xl font-semibold"> {donate.title} </h3>
-              <button
-                className="p-1 ml-auto bg-transparent border-0 text-black opacity-5
-                float-right text-3xl leading-none font-semibold outline-none
-                focus:outline-none"
-                onClick={() => setOpenModel(false)}
-              >
-                <span
-                  className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl
-                block outline-none focus:outline-none"
-                >
-                  x
-                </span>
-              </button>
             </div>
-            {/*body*/}
-            <div className="relative p-6 flex-auto">
+            <div className="relative p-6 pt-1 flex-auto">
               <p className="my-4 text-slate-500 text-lg leading-relaxed">
                 {donate.description}
               </p>
+              {(compaignType !== "chiến dịch của tôi" && campaign.startDate < new Date() && campaign.deadline > new Date()) && (
+                <input
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="Số tiền"
+                  required
+                  type="text"
+                  className="flex-grow w-full h-12 px-4 mb-2 transition duration-200
+                  bg-white border border-gray-30 rounded shadow-sm appearance-none
+                  focus:border-deep-purple-accent-400 focus:outline-none
+                  focus:shadow-outline"
+                  id="firstName"
+                  name="firstName"
+                />
+              )}
 
-              <input
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="số tiền"
-                required
-                type="text"
-                className="flex-grow w-full h-12 px-4 mb-2 transition duration-200
-                bg-white border border-gray-30 rounded shadow-sm appearance-none
-                focus:border-deep-purple-accent-400 focus:outline-none
-                focus:shadow-outline"
-                id="firstName"
-                name="firstName"
-              />
-
-              {allDonationData?.map((donate, i) => (
-                <p className="my-4 text-slate-500 text-lg leading-relaxed">
-                  {i + 1}: {donate.donation} {""}
-                  {donate.donator.slice(0, 35)}
-                </p>
-              ))}
+              {compaignType === "chiến dịch của tôi" && (
+                <div>
+                  <p className="text-lg font-semibold my-4 text-center uppercase">
+                    Lịch sử quyên tặng
+                  </p>
+                  <table className="min-w-full table-auto border-collapse border border-gray-300">
+                    <thead>
+                      <tr>
+                        <th className="px-4 py-2 text-center border border-gray-300">STT</th>
+                        <th className="px-4 py-2 text-center border border-gray-300">
+                          Người quyên tặng
+                        </th>
+                        <th className="px-4 py-2 text-center border border-gray-300">
+                          Số tiền (ETH)
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Array.isArray(allDonationData) &&
+                      allDonationData.length > 0 ? (
+                        <>
+                          {allDonationData.map((donate, i) => (
+                          <tr key={i} className="border-b">
+                            <td className="px-4 py-2 text-center border border-gray-300">{i + 1}</td>
+                            <td className="px-4 py-2 text-center border border-gray-300">{donate.donator}</td>
+                            <td className="px-4 py-2 text-right border border-gray-300">{donate.donation}</td>
+                          </tr>
+                          ))}
+                          <tr className="font-bold">
+                            <td colSpan="2" className="px-4 py-2 text-center border border-gray-300">Tổng</td>
+                            <td className="px-4 py-2 text-right border border-gray-300">
+                              {allDonationData.reduce((total, donate) => total + parseFloat(donate.donation || 0), 0)}
+                            </td>
+                          </tr>
+                        </>
+                      ) : (
+                        <tr>
+                          <td colSpan="3" className="px-4 py-2 text-center">
+                            Không có dữ liệu quyên tặng
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              {compaignType !== "chiến dịch của tôi" && (
+                <>
+                {campaign.deadline < new Date() && (
+                  <p className="text-lg font-semibold my-4 text-center uppercase text-red-500">
+                    Chiến dịch đã kết thúc
+                  </p>
+                )}
+                {campaign.startDate > new Date() && (
+                  <p className="text-lg font-semibold my-4 text-center uppercase text-gray-600">
+                    Chiến dịch sẽ bắt đầu vào ngày {new Date(campaign.startDate).toLocaleDateString()}
+                  </p>
+                )}
+                </>
+              )}
             </div>
-
-            {/*footer*/}
-            <div
-              className="flex items-center justify-end p-6 border-t border-solid
-            border-slate-200 rounded-b"
-            >
+            <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
               <button
-                className="text-red-500 background-transparent font-bold uppercase px-6
-                py-2 text-sm outline-none focus:outline-non mr-1 mb-1 ease-linear
-                transition-all duration-150"
+                className="border-2 text-red-500 font-bold uppercase text-sm px-6 py-3 rounded shadow mb-1 ease-linear transition-all duration-150"
                 type="button"
                 onClick={() => setOpenModel(false)}
               >
                 Đóng
               </button>
-              <button
-                className="background text-white active:bg-emerald-600 font-bold
-                uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none
-                focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                typeof="button"
-                onClick={() => createDonation()}
-              >
-                Quyên tặng
-              </button>
+              {(compaignType !== "chiến dịch của tôi" && campaign.startDate < new Date() && campaign.deadline > new Date()) && (
+                <button
+                  className="bg-blue-500 text-white font-bold uppercase text-sm px-6 py-3 ml-4 rounded shadow mb-1 ease-linear transition-all duration-150"
+                  type="button"
+                  onClick={() => createDonation()}
+                >
+                  Quyên tặng
+                </button>
+              )}
             </div>
           </div>
         </div>
       </div>
-      <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
     </>
   );
 };
